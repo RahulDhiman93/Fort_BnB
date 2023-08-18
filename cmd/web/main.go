@@ -5,14 +5,29 @@ import (
 	"bookingApp/cmd/pkg/handlers"
 	"bookingApp/cmd/pkg/render"
 	"fmt"
+	"github.com/alexedwards/scs/v2"
 	"log"
 	"net/http"
+	"time"
 )
 
 const portNum = ":8080"
 
+var app config.AppConfig
+var session *scs.SessionManager
+
 func main() {
-	var app config.AppConfig
+
+	//change to true for Production
+	app.InProduction = false
+
+	session = scs.New()
+	session.Lifetime = 24 * time.Hour
+	session.Cookie.Persist = true
+	session.Cookie.SameSite = http.SameSiteLaxMode
+	session.Cookie.Secure = app.InProduction
+
+	app.Session = session
 
 	tc, err := render.CreateTemplateCache()
 	if err != nil {
@@ -20,7 +35,7 @@ func main() {
 	}
 
 	app.TemplateCache = tc
-	app.UseCache = false //False for DEV //True for Production
+	app.UseCache = app.InProduction
 
 	repo := handlers.NewRepo(&app)
 	handlers.NewHandlers(repo)
