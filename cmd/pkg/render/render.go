@@ -11,13 +11,20 @@ import (
 
 var app *config.AppConfig
 
+// NewTemplates sets the config for the template PKG
 func NewTemplates(a *config.AppConfig) {
 	app = a
 }
 
 func RenderTemplate(w http.ResponseWriter, tmpl string) {
-	//get the template cache from app config
-	tc := app.TemplateCache
+	var tc map[string]*template.Template
+
+	if app.UseCache {
+		//get the template cache from app config
+		tc = app.TemplateCache
+	} else {
+		tc, _ = CreateTemplateCache()
+	}
 
 	//get requested template from cache
 	t, ok := tc[tmpl]
