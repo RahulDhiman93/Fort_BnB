@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"bookingApp/cmd/pkg/config"
+	"bookingApp/cmd/pkg/models"
 	"bookingApp/cmd/pkg/render"
 	"net/http"
 )
@@ -18,14 +19,24 @@ func NewRepo(a *config.AppConfig) *Repository {
 	}
 }
 
+// NewHandlers sets the repository for the handlers
 func NewHandlers(r *Repository) {
 	Repo = r
 }
 
+// Home is the home page handler
 func (m *Repository) Home(w http.ResponseWriter, _ *http.Request) {
-	render.RenderTemplate(w, "home.page.tmpl")
+	render.RenderTemplate(w, "home.page.tmpl", &models.TemplateData{})
 }
 
+// About is the about page handler
 func (m *Repository) About(w http.ResponseWriter, _ *http.Request) {
-	render.RenderTemplate(w, "about.page.tmpl")
+	//Perform Business logic
+	stringMap := make(map[string]string)
+	stringMap["test"] = "Hello, again!"
+
+	//send data to the template
+	render.RenderTemplate(w, "about.page.tmpl", &models.TemplateData{
+		StringMap: stringMap,
+	})
 }
