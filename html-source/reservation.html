@@ -1,13 +1,13 @@
 <!doctype html>
 <html lang="en">
-  <head>
+<head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/css/datepicker-bs5.min.css">
 
     <title>Hello, world!</title>
 
@@ -24,89 +24,148 @@
         .room-image {
             max-width: 50%;
         }
+
+        .redText {
+            color: red;
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="#">Navbar</a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Navbar</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="index.html">Home</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="about.html">About</a>
-              </li>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Rooms
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <li><a class="dropdown-item" href="generals.html">General's Quarters</a></li>
-                  <li><a class="dropdown-item" href="majors.html">Major's Suite</a></li>
-                </ul>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="reservation.html">Book Now</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="contact.html">Contact Us</a>
-              </li>
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="about.html">About</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Rooms
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="generals.html">General's Quarters</a></li>
+                        <li><a class="dropdown-item" href="majors.html">Major's Suite</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="reservation.html">Book Now</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="contact.html">Contact Us</a>
+                </li>
             </ul>
-          </div>
         </div>
-      </nav>
+    </div>
+</nav>
 
-    <div class="container">
+<div class="container">
 
-        <div class="row">
-            <div class="col-md-3"></div>
-            <div class="col-md-6">
-                <h1 class="mt-5">Search for Availability</h1>
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <h1 class="mt-5">Search for Availability</h1>
 
-                <form action="make-reservation.html" method="get">
-                    <div class="row">
-                        <div class="mb-3 col">
-                            <label for="start_date" class="form-label">Start date</label>
-                            <input required type="date" class="form-control" id="start_date" name="start_date" aria-describedby="startDataHelp">
-                            <div id="startDataHelp" class="form-text">Enter your starting date (YYYY-MM-DD)</div>
-                        </div>
-      
-                        <div class="mb-3 col">
-                            <label for="end_date" class="form-label">End date</label>
-                            <input required type="date" class="form-control" id="end_date" name="end_date" aria-describedby="endDataHelp">
-                            <div id="endDataHelp" class="form-text">Enter your ending date (YYYY-MM-DD)</div>
+            <form action="make-reservation.html" method="get">
+
+                <div class="row">
+                    <div class="col">
+                        <div class="row" id="reservation-dates">
+                            <div class="col">
+                                <input required class="form-control" type="text" name="start" placeholder="Arrival Date">
+                            </div>
+
+                            <div class="col">
+                                <input required class="form-control" type="text" name="end" placeholder="Departure Date">
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <button type="submit" class="btn btn-primary">Search</button>
-                </form>
-            </div>
-        </div>
+                <hr>
 
-    </div>
-
-    <div class="row my-footer">
-        <div class="col">
-            Left
-        </div>
-
-        <div class="col">
-            Middle
-        </div>
-
-        <div class="col">
-            Right
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
         </div>
     </div>
 
+    <div class="row">
+        <div class="col">
+            <p id="myP">This is my P</p>
+            <p>
+                <button id="colorButton" class="btn btn-outline-secondary">Click me</button>
+            </p>
+        </div>
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
-  </body>
+</div>
+
+<div class="row my-footer">
+    <div class="col">
+        Left
+    </div>
+
+    <div class="col">
+        Middle
+    </div>
+
+    <div class="col">
+        Right
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/js/datepicker-full.min.js"></script>
+
+<script>
+
+    console.log("I am using Javascript");
+
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (function () {
+        'use strict'
+
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        const forms = document.querySelectorAll('.needs-validation');
+
+        // Loop over them and prevent submission
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+
+    document.getElementById("colorButton").addEventListener("click", function (){
+        let myEl = document.getElementById("myP")
+        if (myEl.classList.contains("redText")) {
+            myEl.classList.remove("redText")
+        } else {
+            myEl.classList.add("redText")
+        }
+    })
+
+    const elem = document.getElementById('reservation-dates');
+    const rangepicker = new DateRangePicker(elem, {
+       format: "yyyy-mm-dd"
+    });
+
+</script>
+
+</body>
 </html>
