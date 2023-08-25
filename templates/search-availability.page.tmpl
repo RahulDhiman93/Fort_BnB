@@ -31,14 +31,14 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col">
-            <p id="myP">This is my P</p>
-            <p>
-                <button id="colorButton" class="btn btn-outline-secondary">Click me</button>
-            </p>
-        </div>
-    </div>
-
 </div>
+{{end}}
+
+{{define "js"}}
+<script>
+    const elem = document.getElementById('reservation-dates');
+    const rangepicker = new DateRangePicker(elem, {
+        format: "yyyy-mm-dd"
+    });
+</script>
 {{end}}

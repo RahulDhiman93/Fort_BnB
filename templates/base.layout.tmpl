@@ -105,32 +105,6 @@
             })
     })()
 
-    document.getElementById("colorButton").addEventListener("click", function (){
-        let html = `
-        <form id="check-availability-form" action="" method="post" novalidate class="needs-validation">
-           <div class="row">
-                    <div class="col">
-                        <div class="row" id="reservation-dates-model">
-                            <div class="col">
-                                <input disabled required class="form-control" type="text" name="start" id="start" placeholder="Arrival Date">
-                            </div>
-
-                            <div class="col">
-                                <input disabled required class="form-control" type="text" name="end" id="end" placeholder="Departure Date">
-                            </div>
-                        </div>
-                    </div>
-           </div>
-        </form>
-        `
-
-        attention.custom({msg: html, title: "Choose your dates"})
-    })
-
-    const elem = document.getElementById('reservation-dates');
-    const rangepicker = new DateRangePicker(elem, {
-        format: "yyyy-mm-dd"
-    });
 
     function notify(msg, type) {
         notie.alert({
