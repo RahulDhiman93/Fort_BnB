@@ -9,5 +9,7 @@
     <orderEntry type="library" name="bootstrap" level="application" />
     <orderEntry type="library" name="bootstrap" level="application" />
     <orderEntry type="library" name="vanillajs-datepicker" level="application" />
+    <orderEntry type="library" name="notie" level="application" />
+    <orderEntry type="library" name="sweetalert2" level="application" />
   </component>
 </module>
