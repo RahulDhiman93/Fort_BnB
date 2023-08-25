@@ -1,8 +1,8 @@
 package render
 
 import (
-	"bookingApp/cmd/pkg/config"
-	"bookingApp/cmd/pkg/models"
+	"bookingApp/internal/config"
+	"bookingApp/internal/models"
 	"bytes"
 	"github.com/justinas/nosurf"
 	"html/template"

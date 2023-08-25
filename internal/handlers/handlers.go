@@ -1,10 +1,12 @@
 package handlers
 
 import (
-	"bookingApp/cmd/pkg/config"
-	"bookingApp/cmd/pkg/models"
-	"bookingApp/cmd/pkg/render"
+	"bookingApp/internal/config"
+	"bookingApp/internal/models"
+	"bookingApp/internal/render"
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -72,6 +74,27 @@ func (m *Repository) PostSearchAvailability(w http.ResponseWriter, r *http.Reque
 	start := r.Form.Get("start")
 	end := r.Form.Get("end")
 	w.Write([]byte(fmt.Sprintf("Start date is %s and end date is %s", start, end)))
+}
+
+type jsonResponse struct {
+	OK      bool   `json:"ok"`
+	Message string `json:"message"`
+}
+
+// AvailabilityJSON handles request for availability and return response
+func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
+	resp := jsonResponse{
+		OK:      true,
+		Message: "Available",
+	}
+
+	out, err := json.MarshalIndent(resp, "", "     ")
+	if err != nil {
+		log.Println(err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(out)
 }
 
 // Contact renders contact us page for queries

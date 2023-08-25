@@ -1,9 +1,9 @@
 package main
 
 import (
-	"bookingApp/cmd/pkg/config"
-	"bookingApp/cmd/pkg/handlers"
-	"bookingApp/cmd/pkg/render"
+	"bookingApp/internal/config"
+	"bookingApp/internal/handlers"
+	"bookingApp/internal/render"
 	"fmt"
 	"github.com/alexedwards/scs/v2"
 	"log"
