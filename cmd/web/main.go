@@ -3,7 +3,9 @@ package main
 import (
 	"bookingApp/internal/config"
 	"bookingApp/internal/handlers"
+	"bookingApp/internal/models"
 	"bookingApp/internal/render"
+	"encoding/gob"
 	"fmt"
 	"github.com/alexedwards/scs/v2"
 	"log"
@@ -17,6 +19,8 @@ var app config.AppConfig
 var session *scs.SessionManager
 
 func main() {
+	//Session date types (what I am to put)
+	gob.Register(models.Reservation{})
 
 	//change to true for Production
 	app.InProduction = false
