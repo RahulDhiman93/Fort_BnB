@@ -19,6 +19,23 @@ var app config.AppConfig
 var session *scs.SessionManager
 
 func main() {
+	err := run()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Application listening on ", portNum)
+
+	srv := &http.Server{
+		Addr:    portNum,
+		Handler: routes(&app),
+	}
+
+	err = srv.ListenAndServe()
+	log.Fatal(err)
+}
+
+func run() error {
 	//Session date types (what I am to put)
 	gob.Register(models.Reservation{})
 
@@ -35,7 +52,7 @@ func main() {
 
 	tc, err := render.CreateTemplateCache()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	app.TemplateCache = tc
@@ -46,13 +63,5 @@ func main() {
 
 	render.NewTemplates(&app)
 
-	fmt.Println("Application listening on ", portNum)
-
-	srv := &http.Server{
-		Addr:    portNum,
-		Handler: routes(&app),
-	}
-
-	err = srv.ListenAndServe()
-	log.Fatal(err)
+	return nil
 }
