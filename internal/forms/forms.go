@@ -62,10 +62,3 @@ func (f *Form) IsEmail(field string) {
 		f.Errors.Add(field, "Invalid email address")
 	}
 }
-
-// IsPhoneCorrect To use to check if phone is in correct format
-func (f *Form) IsPhoneCorrect(field string) {
-	if !govalidator.IsNumeric(field) {
-		f.Errors.Add(field, "Invalid Phone Number")
-	}
-}
