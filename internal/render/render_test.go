@@ -43,7 +43,7 @@ func TestRenderTemplate(t *testing.T) {
 
 	err = RenderTemplate(&ww, r, "homeee.page.tmpl", &models.TemplateData{})
 	if err == nil {
-		t.Error("Rendered template that does not exis t")
+		t.Error("Rendered template that does not exist")
 	}
 }
 
@@ -83,6 +83,5 @@ func (mw *myWriter) WriteHeader(i int) {
 }
 
 func (mw *myWriter) Write(b []byte) (int, error) {
-	len := len(b)
-	return len, nil
+	return len(b), nil
 }
