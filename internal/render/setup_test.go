@@ -5,6 +5,7 @@ import (
 	"bookingApp/internal/models"
 	"encoding/gob"
 	"github.com/alexedwards/scs/v2"
+	"log"
 	"net/http"
 	"os"
 	"testing"
@@ -20,6 +21,14 @@ func TestMain(m *testing.M) {
 
 	//change to true for Production
 	testApp.InProduction = false
+
+	//Info Log setup
+	infoLog := log.New(os.Stdout, "INDO\t", log.Ldate|log.Ltime)
+	testApp.InfoLog = infoLog
+
+	//Error Log setup
+	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	testApp.ErrorLog = errorLog
 
 	session = scs.New()
 	session.Lifetime = 24 * time.Hour

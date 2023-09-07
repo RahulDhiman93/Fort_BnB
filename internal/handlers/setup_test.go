@@ -11,7 +11,9 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/justinas/nosurf"
 	"html/template"
+	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"time"
 )
@@ -27,6 +29,14 @@ func getRoutes() http.Handler {
 
 	//change to true for Production
 	app.InProduction = false
+
+	//Info Log setup
+	infoLog := log.New(os.Stdout, "INDO\t", log.Ldate|log.Ltime)
+	app.InfoLog = infoLog
+
+	//Error Log setup
+	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	app.ErrorLog = errorLog
 
 	session = scs.New()
 	session.Lifetime = 24 * time.Hour
