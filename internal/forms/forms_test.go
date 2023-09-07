@@ -71,6 +71,11 @@ func TestForm_MinLength(t *testing.T) {
 		t.Error("Field length is present but field doesn't exist")
 	}
 
+	isError := form.Errors.Get("whatever")
+	if isError == "" {
+		t.Error("Error is present but not found in Form Errors")
+	}
+
 	postData = url.Values{}
 	postData.Add("test", "checking")
 
@@ -78,6 +83,11 @@ func TestForm_MinLength(t *testing.T) {
 	form.MinLength("test", length)
 	if !form.Valid() {
 		t.Error("Got length different from expected length")
+	}
+
+	isError = form.Errors.Get("test")
+	if isError != "" {
+		t.Error("Error is not present but found in Form Errors")
 	}
 }
 
