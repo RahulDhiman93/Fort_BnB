@@ -47,7 +47,7 @@ func run() error {
 	app.InProduction = false
 
 	//Info Log setup
-	infoLog = log.New(os.Stdout, "INDO\t", log.Ldate|log.Ltime)
+	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	app.InfoLog = infoLog
 
 	//Error Log setup
