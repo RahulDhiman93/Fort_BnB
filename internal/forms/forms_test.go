@@ -44,62 +44,56 @@ func TestForm_Required(t *testing.T) {
 
 // TestForm_Has tests if a field is present inside a form or not
 func TestForm_Has(t *testing.T) {
-	r := httptest.NewRequest("POST", "/whatever", nil)
-	form := New(r.PostForm)
-	x := form.Get("whatever")
-	if x != "" {
+	postData := url.Values{}
+	form := New(postData)
+	has := form.Has("whatever")
+	if has {
 		t.Error("Got a field value but it is not present in the form")
 	}
 
-	postData := url.Values{}
+	postData = url.Values{}
 	postData.Add("test", "checking")
 
-	r, _ = http.NewRequest("POST", "/whatever", nil)
-	r.PostForm = postData
-	form = New(r.PostForm)
-	x = form.Get("test")
-	if x == "" {
+	form = New(postData)
+	has = form.Has("test")
+	if !has {
 		t.Error("Got a empty value but field is present in the form")
 	}
 }
 
 // TestForm_MinLength tests the minimum length of a field inside a form
 func TestForm_MinLength(t *testing.T) {
+	postData := url.Values{}
 	length := 8
-	r := httptest.NewRequest("POST", "/whatever", nil)
-	form := New(r.PostForm)
-	x := form.Get("whatever")
-	if len(x) == length {
+	form := New(postData)
+	form.MinLength("whatever", length)
+	if form.Valid() {
 		t.Error("Field length is present but field doesn't exist")
 	}
 
-	postData := url.Values{}
+	postData = url.Values{}
 	postData.Add("test", "checking")
 
-	r, _ = http.NewRequest("POST", "/whatever", nil)
-	r.PostForm = postData
-	form = New(r.PostForm)
-	x = form.Get("test")
-	if len(x) != length {
+	form = New(postData)
+	form.MinLength("test", length)
+	if !form.Valid() {
 		t.Error("Got length different from expected length")
 	}
 }
 
 // TestForm_IsEmail Check if the field value is EMAIL or not
 func TestForm_IsEmail(t *testing.T) {
-	r := httptest.NewRequest("POST", "/whatever", nil)
-	form := New(r.PostForm)
+	postData := url.Values{}
+	form := New(postData)
 	form.IsEmail("whatever")
 	if form.Valid() {
 		t.Error("Not an email but still passed")
 	}
 
-	postData := url.Values{}
+	postData = url.Values{}
 	postData.Add("email", "rr@rr.com")
 
-	r, _ = http.NewRequest("POST", "/whatever", nil)
-	r.PostForm = postData
-	form = New(r.PostForm)
+	form = New(postData)
 	form.IsEmail("email")
 	if !form.Valid() {
 		t.Error("Email exists but still failed")
