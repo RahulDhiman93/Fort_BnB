@@ -2,6 +2,7 @@ package main
 
 import (
 	"bookingApp/internal/config"
+	"bookingApp/internal/driver"
 	"bookingApp/internal/handlers"
 	"bookingApp/internal/helpers"
 	"bookingApp/internal/models"
@@ -23,10 +24,11 @@ var infoLog *log.Logger
 var errorLog *log.Logger
 
 func main() {
-	err := run()
+	db, err := run()
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.SQL.Close()
 
 	fmt.Println("Application listening on ", portNum)
 
@@ -39,7 +41,7 @@ func main() {
 	log.Fatal(err)
 }
 
-func run() error {
+func run() (*driver.DB, error) {
 	//Session date types (what I am to put)
 	gob.Register(models.Reservation{})
 
@@ -62,18 +64,27 @@ func run() error {
 
 	app.Session = session
 
+	//Connect to DB
+	log.Println("<<<-- Connecting to DB")
+	db, err := driver.ConnectSQL("host=localhost port=5432 dbname=HotelBookings user=rahuldhiman password=")
+	if err != nil {
+		log.Fatal("Cannot connect to DB, dying!!!...")
+		return nil, err
+	}
+	log.Println("Connected to DB -->>>")
+
 	tc, err := render.CreateTemplateCache()
 	if err != nil {
-		return err
+		return db, err
 	}
 
 	app.TemplateCache = tc
 	app.UseCache = app.InProduction
 
-	repo := handlers.NewRepo(&app)
+	repo := handlers.NewRepo(&app, db)
 	handlers.NewHandlers(repo)
 	render.NewTemplates(&app)
 	helpers.NewHelpers(&app)
 
-	return nil
+	return db, nil
 }
