@@ -63,15 +63,6 @@ func (m *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	room, err := m.DB.GetRoomByID(res.RoomID)
-	if err != nil {
-		m.App.Session.Put(r.Context(), "error", "Can't find room")
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
-		return
-	}
-
-	res.Room.RoomName = room.RoomName
-
 	m.App.Session.Put(r.Context(), "reservation", res)
 
 	data := make(map[string]interface{})
@@ -124,6 +115,13 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	room, err := m.DB.GetRoomByID(roomID)
+	if err != nil {
+		m.App.Session.Put(r.Context(), "error", "Can't find room")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+
 	reservation := models.Reservation{
 		FirstName: r.Form.Get("first_name"),
 		LastName:  r.Form.Get("last_name"),
@@ -132,6 +130,7 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		StartDate: startDate,
 		EndDate:   endDate,
 		RoomID:    roomID,
+		Room:      room,
 	}
 
 	form := forms.New(r.PostForm)
@@ -333,14 +332,6 @@ func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) 
 	}
 
 	m.App.Session.Remove(r.Context(), "reservation")
-
-	//room, err := m.DB.GetRoomByID(reservation.RoomID)
-	//if err != nil {
-	//	helpers.ServerError(w, err)
-	//	return
-	//}
-	//
-	//reservation.Room = room
 
 	data := make(map[string]interface{})
 	data["reservation"] = reservation
