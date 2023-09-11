@@ -10,6 +10,7 @@ import (
 	"bookingApp/internal/repository"
 	"bookingApp/internal/repository/dbrepo"
 	"encoding/json"
+	"fmt"
 	"github.com/go-chi/chi"
 	"net/http"
 	"strconv"
@@ -38,8 +39,8 @@ func NewTestRepo(a *config.AppConfig) *Repository {
 	}
 }
 
-// NewHandlers sets the repository for the handlers
-func NewHandlers(r *Repository) {
+// FreshHandlers sets the repository for the handlers
+func FreshHandlers(r *Repository) {
 	Repo = r
 }
 
@@ -170,6 +171,34 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
+
+	//send notification
+	htmlMsg := fmt.Sprintf(`
+		<strong>Reservation Confirmation</strong><br>
+        Dear %s,<br>
+		This is to confirm your reservation from %s to %s`, reservation.FirstName, reservation.StartDate.Format("2006-01-02"), reservation.EndDate.Format("2006-01-02"))
+
+	msg := models.MailData{
+		To:       reservation.Email,
+		From:     "MyHotel@BnB.com",
+		Subject:  "Reservation Confirmation",
+		Content:  htmlMsg,
+		Template: "basic.html",
+	}
+	m.App.MailChan <- msg
+
+	htmlMsg = fmt.Sprintf(`
+		<strong>Reservation Confirmation</strong><br>
+        Dear Admim,<br>
+		This is to confirm you have a reservation from %s to %s from %s`, reservation.StartDate.Format("2006-01-02"), reservation.EndDate.Format("2006-01-02"), reservation.FirstName)
+
+	msg = models.MailData{
+		To:      "admin@BnB.com",
+		From:    "MyHotel@BnB.com",
+		Subject: "Reservation Confirmation",
+		Content: htmlMsg,
+	}
+	m.App.MailChan <- msg
 
 	m.App.Session.Put(r.Context(), "reservation", reservation)
 

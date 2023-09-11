@@ -30,6 +30,11 @@ func main() {
 	}
 	defer db.SQL.Close()
 
+	defer close(app.MailChan)
+
+	fmt.Println("Starting mail listener...>>")
+	ListenForMail()
+
 	fmt.Println("Application listening on ", portNum)
 
 	srv := &http.Server{
@@ -47,6 +52,9 @@ func run() (*driver.DB, error) {
 	gob.Register(models.User{})
 	gob.Register(models.Room{})
 	gob.Register(models.Restriction{})
+
+	mailChan := make(chan models.MailData)
+	app.MailChan = mailChan
 
 	//change to true for Production
 	app.InProduction = false
@@ -85,7 +93,7 @@ func run() (*driver.DB, error) {
 	app.UseCache = app.InProduction
 
 	repo := handlers.NewRepo(&app, db)
-	handlers.NewHandlers(repo)
+	handlers.FreshHandlers(repo)
 	render.NewRenderer(&app)
 	helpers.NewHelpers(&app)
 
