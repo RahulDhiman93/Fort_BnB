@@ -604,7 +604,32 @@ func (m *Repository) AdminReservationsCalendar(w http.ResponseWriter, r *http.Re
 func (m *Repository) AdminProcessReservation(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 	src := chi.URLParam(r, "src")
-	_ = m.DB.UpdateProcessedForReservation(id, 1)
+	reservation, err := m.DB.GetReservationByID(id)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+	err = m.DB.UpdateProcessedForReservation(id, 1)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	//send notification
+	htmlMsg := fmt.Sprintf(`
+		<strong>Reservation Accepted</strong><br>
+        Dear %s,<br>
+		This is to inform you, that your reservation from %s to %s has been accepted by BnB`, reservation.FirstName, reservation.StartDate.Format("2006-01-02"), reservation.EndDate.Format("2006-01-02"))
+
+	msg := models.MailData{
+		To:       reservation.Email,
+		From:     "MyHotel@BnB.com",
+		Subject:  "Reservation Accepted",
+		Content:  htmlMsg,
+		Template: "basic.html",
+	}
+	m.App.MailChan <- msg
+
 	m.App.Session.Put(r.Context(), "flash", "Reservation marked as processed")
 	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
 }
@@ -613,7 +638,32 @@ func (m *Repository) AdminProcessReservation(w http.ResponseWriter, r *http.Requ
 func (m *Repository) AdminDeleteReservation(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 	src := chi.URLParam(r, "src")
-	_ = m.DB.DeleteReservation(id)
+	reservation, err := m.DB.GetReservationByID(id)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+	err = m.DB.DeleteReservation(id)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	//send notification
+	htmlMsg := fmt.Sprintf(`
+		<strong>Reservation Cancelled</strong><br>
+        Dear %s,<br>
+		This is to inform you, that your reservation from %s to %s has been cancelled by BnB`, reservation.FirstName, reservation.StartDate.Format("2006-01-02"), reservation.EndDate.Format("2006-01-02"))
+
+	msg := models.MailData{
+		To:       reservation.Email,
+		From:     "MyHotel@BnB.com",
+		Subject:  "Reservation Cancelled",
+		Content:  htmlMsg,
+		Template: "basic.html",
+	}
+	m.App.MailChan <- msg
+
 	m.App.Session.Put(r.Context(), "flash", "Reservation deleted")
 	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
 }
