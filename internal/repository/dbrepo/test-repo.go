@@ -21,7 +21,7 @@ func (m *testDBRepo) InsertReservation(res models.Reservation) (int, error) {
 }
 
 // InsertRoomRestriction inserts a room restriction into database
-func (m *testDBRepo) InsertRoomRestriction(r models.RoomRestriction) error {
+func (m *testDBRepo) InsertRoomRestriction(r models.RoomsRestriction) error {
 	if r.RoomID == 1000 {
 		return errors.New("insert room restriction error")
 	}
@@ -120,4 +120,16 @@ func (m *testDBRepo) AllNewReservations() ([]models.Reservation, error) {
 func (m *testDBRepo) GetReservationByID(id int) (models.Reservation, error) {
 	var res models.Reservation
 	return res, nil
+}
+
+func (m *testDBRepo) UpdateReservation(r models.Reservation) error {
+	return nil
+}
+
+func (m *testDBRepo) DeleteReservation(id int) error {
+	return nil
+}
+
+func (m *testDBRepo) UpdateProcessedForReservation(id int, processed int) error {
+	return nil
 }
