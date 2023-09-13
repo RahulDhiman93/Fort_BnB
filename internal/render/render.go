@@ -2,6 +2,7 @@ package render
 
 import (
 	"bookingApp/internal/config"
+	"bookingApp/internal/helpers"
 	"bookingApp/internal/models"
 	"bytes"
 	"errors"
@@ -59,9 +60,9 @@ func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateDa
 	td.Error = app.Session.PopString(r.Context(), "error")
 	td.Warning = app.Session.PopString(r.Context(), "warning")
 	td.CSRFToken = nosurf.Token(r)
-	//if helpers.IsAuthenticated(r) {
-	//	td.IsAuthenticated = 1
-	//}
+	if helpers.IsAuthenticated(r) {
+		td.IsAuthenticated = 1
+	}
 	return td
 }
 
