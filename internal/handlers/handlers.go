@@ -538,6 +538,12 @@ func (m *Repository) AdminShowReservation(w http.ResponseWriter, r *http.Request
 	stringMap := make(map[string]string)
 	stringMap["src"] = src
 
+	year := r.URL.Query().Get("y")
+	month := r.URL.Query().Get("m")
+
+	stringMap["month"] = month
+	stringMap["year"] = year
+
 	//get reservation from DB
 	res, err := m.DB.GetReservationByID(id)
 	if err != nil {
@@ -592,7 +598,15 @@ func (m *Repository) AdminPostShowReservation(w http.ResponseWriter, r *http.Req
 	}
 
 	m.App.Session.Put(r.Context(), "flash", "changes saved")
-	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
+
+	month := r.Form.Get("month")
+	year := r.Form.Get("year")
+
+	if year == "" && month == "" {
+		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
+	} else {
+		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-calendar?y=%s&m=%s", year, month), http.StatusSeeOther)
+	}
 }
 
 // AdminReservationsCalendar displays the reservation calendar for admin
@@ -675,10 +689,7 @@ func (m *Repository) AdminReservationsCalendar(w http.ResponseWriter, r *http.Re
 				}
 			} else {
 				//it's a block
-				for d := y.StartDate; d.After(y.EndDate) == false; d = d.AddDate(0, 0, 1) {
-					blockMap[d.Format("2006-01-2")] = y.ID
-				}
-				//blockMap[y.StartDate.Format("2006-01-2")] = y.ID
+				blockMap[y.StartDate.Format("2006-01-2")] = y.ID
 			}
 		}
 
@@ -726,7 +737,15 @@ func (m *Repository) AdminProcessReservation(w http.ResponseWriter, r *http.Requ
 	m.App.MailChan <- msg
 
 	m.App.Session.Put(r.Context(), "flash", "Reservation marked as processed")
-	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
+
+	month := r.URL.Query().Get("m")
+	year := r.URL.Query().Get("y")
+
+	if year == "" && month == "" {
+		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
+	} else {
+		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-calendar?y=%s&m=%s", year, month), http.StatusSeeOther)
+	}
 }
 
 // AdminDeleteReservation deletes a reservation
@@ -760,5 +779,68 @@ func (m *Repository) AdminDeleteReservation(w http.ResponseWriter, r *http.Reque
 	m.App.MailChan <- msg
 
 	m.App.Session.Put(r.Context(), "flash", "Reservation deleted")
-	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
+
+	month := r.URL.Query().Get("m")
+	year := r.URL.Query().Get("y")
+
+	if year == "" && month == "" {
+		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-%s", src), http.StatusSeeOther)
+	} else {
+		http.Redirect(w, r, fmt.Sprintf("/admin/reservations-calendar?y=%s&m=%s", year, month), http.StatusSeeOther)
+	}
+}
+
+// AdminPostReservationsCalendar handles post of reservation calendat
+func (m *Repository) AdminPostReservationsCalendar(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	year, _ := strconv.Atoi(r.Form.Get("y"))
+	month, _ := strconv.Atoi(r.Form.Get("m"))
+
+	//process blocks
+	rooms, err := m.DB.AllRooms()
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	form := forms.New(r.PostForm)
+
+	for _, x := range rooms {
+		curMap := m.App.Session.Get(r.Context(), fmt.Sprintf("block_map_%d", x.ID)).(map[string]int)
+		for name, value := range curMap {
+			if val, ok := curMap[name]; ok {
+				if val > 0 {
+					if !form.Has(fmt.Sprintf("remove_block_%d_%s", x.ID, name)) {
+						err := m.DB.DeleteBlockByID(value)
+						if err != nil {
+							helpers.ServerError(w, err)
+							return
+						}
+					}
+				}
+			}
+		}
+	}
+
+	for name, _ := range r.PostForm {
+		if strings.HasPrefix(name, "add_block") {
+			exploded := strings.Split(name, "_")
+			roomID, _ := strconv.Atoi(exploded[2])
+			t, _ := time.Parse("2006-01-2", exploded[3])
+
+			err := m.DB.InsertBlockForRoom(roomID, t)
+			if err != nil {
+				helpers.ServerError(w, err)
+				return
+			}
+		}
+	}
+
+	m.App.Session.Put(r.Context(), "flash", "changes saved")
+	http.Redirect(w, r, fmt.Sprintf("/admin/reservations-calendar?y=%d&m=%d", year, month), http.StatusSeeOther)
 }
