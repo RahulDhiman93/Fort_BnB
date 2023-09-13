@@ -31,21 +31,18 @@ var functions = template.FuncMap{
 }
 
 func TestMain(m *testing.M) {
-	//Session date types (what I am to put)
 	gob.Register(models.Reservation{})
 	gob.Register(models.User{})
 	gob.Register(models.Room{})
 	gob.Register(models.Restriction{})
 	gob.Register(map[string]int{})
 
-	//change to true for Production
+	// change this to true when in production
 	app.InProduction = false
 
-	//Info Log setup
-	infoLog := log.New(os.Stdout, "INDO\t", log.Ldate|log.Ltime)
+	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	app.InfoLog = infoLog
 
-	//Error Log setup
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 	app.ErrorLog = errorLog
 
@@ -65,7 +62,7 @@ func TestMain(m *testing.M) {
 
 	tc, err := CreateTestTemplateCache()
 	if err != nil {
-
+		log.Fatal("cannot create template cache")
 	}
 
 	app.TemplateCache = tc
@@ -87,7 +84,6 @@ func listenForMail() {
 }
 
 func getRoutes() http.Handler {
-
 	mux := chi.NewRouter()
 
 	mux.Use(middleware.Recoverer)
@@ -103,6 +99,9 @@ func getRoutes() http.Handler {
 	mux.Post("/search-availability", Repo.PostSearchAvailability)
 	mux.Post("/search-availability-json", Repo.AvailabilityJSON)
 
+	mux.Get("/choose-room/{id}", Repo.ChooseRoom)
+	mux.Get("/book-room", Repo.BookRoom)
+
 	mux.Get("/contact", Repo.Contact)
 
 	mux.Get("/make-reservation", Repo.Reservation)
@@ -114,6 +113,7 @@ func getRoutes() http.Handler {
 	mux.Get("/user/logout", Repo.Logout)
 
 	mux.Get("/admin/dashboard", Repo.AdminDashboard)
+
 	mux.Get("/admin/reservations-new", Repo.AdminNewReservations)
 	mux.Get("/admin/reservations-all", Repo.AdminAllReservations)
 	mux.Get("/admin/reservations-calendar", Repo.AdminReservationsCalendar)
@@ -130,7 +130,7 @@ func getRoutes() http.Handler {
 	return mux
 }
 
-// NoSurf Use for CSRF Token
+// NoSurf adds CSRF protection to all POST requests
 func NoSurf(next http.Handler) http.Handler {
 	csrfHandler := nosurf.New(next)
 
@@ -140,40 +140,43 @@ func NoSurf(next http.Handler) http.Handler {
 		Secure:   app.InProduction,
 		SameSite: http.SameSiteLaxMode,
 	})
-
 	return csrfHandler
 }
 
-// SessionLoad Use for loading Session
+// SessionLoad loads and saves the session on every request
 func SessionLoad(next http.Handler) http.Handler {
 	return session.LoadAndSave(next)
 }
 
+// CreateTestTemplateCache creates a template cache as a map
 func CreateTestTemplateCache() (map[string]*template.Template, error) {
+
 	myCache := map[string]*template.Template{}
 
-	//get all the files name *.page.tmpl from ./templates
 	pages, err := filepath.Glob(fmt.Sprintf("%s/*.page.tmpl", pathToTemplates))
 	if err != nil {
+		log.Println(err)
 		return myCache, err
 	}
 
-	//range through all pages
 	for _, page := range pages {
 		name := filepath.Base(page)
 		ts, err := template.New(name).Funcs(functions).ParseFiles(page)
 		if err != nil {
+			log.Println(err)
 			return myCache, err
 		}
 
 		matches, err := filepath.Glob(fmt.Sprintf("%s/*.layout.tmpl", pathToTemplates))
 		if err != nil {
+			log.Println(err)
 			return myCache, err
 		}
 
 		if len(matches) > 0 {
 			ts, err = ts.ParseGlob(fmt.Sprintf("%s/*.layout.tmpl", pathToTemplates))
 			if err != nil {
+				log.Println(err)
 				return myCache, err
 			}
 		}
