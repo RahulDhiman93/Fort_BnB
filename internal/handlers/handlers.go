@@ -143,10 +143,18 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	if !form.Valid() {
 		data := make(map[string]interface{})
 		data["reservation"] = reservation
-		http.Error(w, "Form Invalid", http.StatusSeeOther)
+
+		sd := reservation.StartDate.Format("2006-01-02")
+		ed := reservation.EndDate.Format("2006-01-02")
+
+		stringMap := make(map[string]string)
+		stringMap["start_date"] = sd
+		stringMap["end_date"] = ed
+
 		render.Template(w, r, "make-reservation.page.tmpl", &models.TemplateData{
-			Form: form,
-			Data: data,
+			StringMap: stringMap,
+			Form:      form,
+			Data:      data,
 		})
 		return
 	}
@@ -387,6 +395,13 @@ func (m *Repository) ChooseRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	room, err := m.DB.GetRoomByID(roomID)
+	if err != nil {
+		m.App.Session.Put(r.Context(), "error", "Can't find room")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
 	res, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
 		m.App.Session.Put(r.Context(), "error", "Can't get reservation from session")
@@ -395,6 +410,7 @@ func (m *Repository) ChooseRoom(w http.ResponseWriter, r *http.Request) {
 	}
 
 	res.RoomID = roomID
+	res.Room = room
 
 	m.App.Session.Put(r.Context(), "reservation", res)
 
