@@ -727,11 +727,11 @@ func (m *Repository) AdminReservationsCalendar(w http.ResponseWriter, r *http.Re
 func (m *Repository) AdminProcessReservation(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 	src := chi.URLParam(r, "src")
-	reservation, err := m.DB.GetReservationByID(id)
-	if err != nil {
-		helpers.ServerError(w, err)
-		return
-	}
+	//reservation, err := m.DB.GetReservationByID(id)
+	//if err != nil {
+	//	helpers.ServerError(w, err)
+	//	return
+	//}
 	err = m.DB.UpdateProcessedForReservation(id, 1)
 	if err != nil {
 		helpers.ServerError(w, err)
@@ -769,11 +769,11 @@ func (m *Repository) AdminProcessReservation(w http.ResponseWriter, r *http.Requ
 func (m *Repository) AdminDeleteReservation(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 	src := chi.URLParam(r, "src")
-	reservation, err := m.DB.GetReservationByID(id)
-	if err != nil {
-		helpers.ServerError(w, err)
-		return
-	}
+	//reservation, err := m.DB.GetReservationByID(id)
+	//if err != nil {
+	//	helpers.ServerError(w, err)
+	//	return
+	//}
 	err = m.DB.DeleteReservation(id)
 	if err != nil {
 		helpers.ServerError(w, err)
