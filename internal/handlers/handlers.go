@@ -12,6 +12,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-chi/chi"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -86,12 +87,15 @@ func (m *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
 
 // PostReservation Handles the posting of a reservation form
 func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
+	log.Println("POST RESERVATION -->")
 	err := r.ParseForm()
 	if err != nil {
 		m.App.Session.Put(r.Context(), "error", "Can't parse form")
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
+
+	log.Println("FORM PARSED -->")
 
 	sd := r.Form.Get("start_date")
 	ed := r.Form.Get("end_date")
@@ -110,6 +114,8 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Println("DATES PARSED -->")
+
 	roomID, err := strconv.Atoi(r.Form.Get("room_id"))
 	if err != nil {
 		m.App.Session.Put(r.Context(), "error", "Can't parse room id")
@@ -117,12 +123,16 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Println("ROOMID PARSED -->")
+
 	room, err := m.DB.GetRoomByID(roomID)
 	if err != nil {
 		m.App.Session.Put(r.Context(), "error", "Can't find room")
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
+
+	log.Println("ROOM PARSED -->")
 
 	reservation := models.Reservation{
 		FirstName: r.Form.Get("first_name"),
@@ -159,6 +169,8 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Println("FORM VALID -->")
+
 	newReservationID, err := m.DB.InsertReservation(reservation)
 	if err != nil {
 		m.App.Session.Put(r.Context(), "error", "Can't insert into DB")
@@ -180,6 +192,8 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
+
+	log.Println("DB INSERTIONS PARSED -->")
 
 	//send notification
 	htmlMsg := fmt.Sprintf(`
@@ -209,8 +223,13 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	}
 	m.App.MailChan <- msg
 
+	log.Println("EMAIL SENT -->")
+
 	m.App.Session.Put(r.Context(), "reservation", reservation)
 
+	log.Println("SESSION UPDATED -->")
+
+	log.Println("REDIRECTING TO SUMMARY-->")
 	http.Redirect(w, r, "/reservation-summary", http.StatusSeeOther)
 }
 
