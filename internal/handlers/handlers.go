@@ -732,7 +732,7 @@ func (m *Repository) AdminProcessReservation(w http.ResponseWriter, r *http.Requ
 	//	helpers.ServerError(w, err)
 	//	return
 	//}
-	err = m.DB.UpdateProcessedForReservation(id, 1)
+	err := m.DB.UpdateProcessedForReservation(id, 1)
 	if err != nil {
 		helpers.ServerError(w, err)
 		return
@@ -774,7 +774,7 @@ func (m *Repository) AdminDeleteReservation(w http.ResponseWriter, r *http.Reque
 	//	helpers.ServerError(w, err)
 	//	return
 	//}
-	err = m.DB.DeleteReservation(id)
+	err := m.DB.DeleteReservation(id)
 	if err != nil {
 		helpers.ServerError(w, err)
 		return
