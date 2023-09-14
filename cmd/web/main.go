@@ -76,8 +76,8 @@ func run() (*driver.DB, error) {
 	app.MailChan = mailChan
 
 	//change to true for Production
-	app.InProduction = false //*inProduction
-	app.UseCache = false     //*useCache
+	app.InProduction = *inProduction
+	app.UseCache = *useCache
 
 	//Info Log setup
 	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
